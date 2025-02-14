@@ -33,8 +33,10 @@
     background-color: white;
 }
 .slider {
-    writing-mode: bt-lr;
-    -webkit-appearance: slider-vertical;
+    writing-mode: vertical-lr;
+    direction: rtl;
+    appearance: slider-vertical;
+    vertical-align: bottom;
     height: 200px;
     margin: 10px 0;
 }

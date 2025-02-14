@@ -41,7 +41,7 @@ app.post('/api/update', (req, res) => {
 app.post('/api/control', (req, res) => {
     const { adjustment } = req.body;
     if (typeof adjustment === 'number') {
-        matrix = matrix.map(row => row.map(val => val = Math.min(1, Math.max(0, val + adjustment))));
+        matrix = matrix.map(row => row.map(val => val = adjustment));
         res.json({ success: true, matrix });
     } else {
         res.status(400).json({ error: 'Valeur d\'ajustement invalide' });

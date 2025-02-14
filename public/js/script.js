@@ -24,8 +24,13 @@ function renderMatrix() {
             row.forEach((value, y) => {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
-                cell.style.backgroundColor = `rgb(${Math.round(255 * (1 - value) ** 2)}, ${Math.round(255 * value ** 2)}, 0)`;
-                cell.onclick = () => updateValue(x, y, value + 0.1);
+                if (value === 0) {
+                    cell.style.backgroundColor = `rgba(0, 0, 0, 0.4)`;
+                } else {
+                    const red = Math.round(255 * value);
+                    const green = Math.round(255 * (1 - value));
+                    cell.style.backgroundColor = `rgb(${red}, ${green}, 0)`;
+                }
                 rowDiv.appendChild(cell);
             });
             container.appendChild(rowDiv);
@@ -46,5 +51,5 @@ async function adjustAll(value) {
 function handleSliderChange(event) {
     const value = parseFloat(event.target.value);
     document.getElementById('slider-value').innerText = value.toFixed(2);
-    adjustAll(value - 0.5);
+    adjustAll(value);
 }
