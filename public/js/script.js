@@ -1,4 +1,3 @@
-
 async function request(endpoint, method, body) {
     const response = await fetch(`http://localhost:3000/api/${endpoint}`, {
         method,
@@ -25,7 +24,7 @@ function renderMatrix() {
             row.forEach((value, y) => {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
-                cell.style.backgroundColor = `rgb(${255 * (1 - value)}, ${255 * value}, 0)`;
+                cell.style.backgroundColor = `rgb(${Math.round(255 * (1 - value) ** 2)}, ${Math.round(255 * value ** 2)}, 0)`;
                 cell.onclick = () => updateValue(x, y, value + 0.1);
                 rowDiv.appendChild(cell);
             });
@@ -49,4 +48,3 @@ function handleSliderChange(event) {
     document.getElementById('slider-value').innerText = value.toFixed(2);
     adjustAll(value - 0.5);
 }
-
