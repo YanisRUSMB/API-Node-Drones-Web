@@ -37,6 +37,24 @@ app.post('/api/update', (req, res) => {
 
 });
 
+app.post('/api/update/list', (req, res) => {
+    const {list, value} = req.body;
+    if (!Array.isArray(list)) {
+        return res.status(400).json({ error: 'La liste doit être un tableau' });
+    }
+    list.forEach(element => {
+        const { x, y } = element;
+        if (x >= 0 && x < rows && y >= 0 && y < cols && value >= 0 && value <= 1) {
+            matrix[x][y] = value;
+        } else {
+            res.status(400).json({ error: 'Coordonnées invalides ou valeur hors limites' });
+        }
+    });
+    res.json({ success: true});
+
+
+});
+
 // Route pour ajuster globalement la puissance
 app.post('/api/control', (req, res) => {
     const { adjustment } = req.body;

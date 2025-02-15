@@ -1,5 +1,5 @@
 
-selectedCell = null;
+selectedCell = [];
 cells = null;
 
 async function request(endpoint, method, body) {
@@ -36,9 +36,10 @@ function renderMatrix() {
                     const green = Math.round(255 * (1 - value));
                     cell.style.backgroundColor = `rgb(${red}, ${green}, 0)`;
                 }
-                if (selectedCell?.dataset.x == x && selectedCell?.dataset.y == y) {
-                    cell.classList.add('selected');
-                    selectedCell = cell;
+                const isSelected = this.selectedCell.find(c => c.dataset.x == x && c.dataset.y == y);
+                if (isSelected) {
+                    removeSelectedCell(isSelected);
+                    addSelectedCell(cell);
                 }
                 container.appendChild(cell);
             });
@@ -47,21 +48,34 @@ function renderMatrix() {
         cells = Array.from(document.getElementsByClassName('cell'));
         cells.forEach(cell => {
             cell.addEventListener('click', () => {
+                console.log(selectedCell);
                 if (cell.classList.contains('selected')) {
-                    selectedCell?.classList.remove('selected');
-                    selectedCell = null;
+                    removeSelectedCell(cell);
                     return;
                 }
-                selectedCell?.classList.remove('selected');
-                selectedCell = cell
-                cell.classList.add('selected');
+                addSelectedCell(cell);
             });
         });
     });
 }
 
+function addSelectedCell(cell) {
+    cell.classList.add('selected');
+    selectedCell.push(cell);
+}
+
+function removeSelectedCell(cell) {
+    cell.classList.remove('selected');
+    selectedCell = selectedCell.filter(c => c.dataset.x != cell.dataset.x || c.dataset.y != cell.dataset.y);
+}
+
 async function updateValue(x, y, value) {
     await request('update', 'POST', { x, y, value });
+    renderMatrix();
+}
+
+async function updateList(list, value) {
+    await request('update/list', 'POST', { list, value });
     renderMatrix();
 }
 
@@ -73,8 +87,12 @@ async function adjustAll(value) {
 function handleSliderChange(event) {
     const value = parseFloat(event.target.value);
     document.getElementById('slider-value').innerText = value.toFixed(2);
-    if (selectedCell) {
-        return updateValue(selectedCell.dataset.x, selectedCell.dataset.y, value);
+    if (selectedCell.length > 0) {
+        const list = selectedCell.map(cell => {
+            return { x: parseInt(cell.dataset.x), y: parseInt(cell.dataset.y) };
+        });
+        
+        updateList(list, value);
     }else {
         adjustAll(value);
     }
