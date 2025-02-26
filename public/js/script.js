@@ -102,7 +102,7 @@ async function adjustAll(value) {
 }
 
 function handleSliderChange(event) {
-    const value =  (event.target.value);
+    const value = parseFloat(event.target.value);
     document.getElementById('slider-value').innerText = value.toFixed(2);
     if (selectedCell.length > 0) {
         const list = selectedCell.map(cell => {
