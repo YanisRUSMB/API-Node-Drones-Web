@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "concurrently \"node-sass --watch scss/ -o public/css/\" \"node app.js\""
   },
   "author": "",
   "license": "ISC",
@@ -11,5 +11,9 @@
   "dependencies": {
     "ejs": "^3.1.10",
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "node-sass": "^9.0.0"
   }
 }

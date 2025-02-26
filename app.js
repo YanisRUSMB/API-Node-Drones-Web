@@ -50,7 +50,7 @@ app.post('/api/update/list', (req, res) => {
             res.status(400).json({ error: 'Coordonnées invalides ou valeur hors limites' });
         }
     });
-    res.json({ success: true});
+    res.json({ success: true });
 
 
 });

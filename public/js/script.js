@@ -16,10 +16,10 @@ async function getMatrix() {
 }
 
 addEventListener("DOMContentLoaded", () => {
-    renderMatrix();
+    createMatrix();
 });
 
-function renderMatrix() {
+function createMatrix() {
     getMatrix().then(matrix => {
         const container = document.getElementById('matrix');
         container.innerHTML = '';
@@ -29,18 +29,7 @@ function renderMatrix() {
                 cell.className = 'cell';
                 cell.dataset.x = x;
                 cell.dataset.y = y;
-                if (value === 0) {
-                    cell.style.backgroundColor = `rgba(0, 0, 0, 0.4)`;
-                } else {
-                    const red = Math.round(255 * value);
-                    const green = Math.round(255 * (1 - value));
-                    cell.style.backgroundColor = `rgb(${red}, ${green}, 0)`;
-                }
-                const isSelected = this.selectedCell.find(c => c.dataset.x == x && c.dataset.y == y);
-                if (isSelected) {
-                    removeSelectedCell(isSelected);
-                    addSelectedCell(cell);
-                }
+                updateCell(cell, value);
                 container.appendChild(cell);
             });
         });
@@ -48,7 +37,6 @@ function renderMatrix() {
         cells = Array.from(document.getElementsByClassName('cell'));
         cells.forEach(cell => {
             cell.addEventListener('click', () => {
-                console.log(selectedCell);
                 if (cell.classList.contains('selected')) {
                     removeSelectedCell(cell);
                     return;
@@ -58,6 +46,27 @@ function renderMatrix() {
         });
     });
 }
+
+function renderEngine(x, y, value){
+   updateCell(cells.find(cell => cell.dataset.x == x && cell.dataset.y == y), value);
+    
+}
+
+function updateCell(cell, value) {
+    if (value === 0) {
+        cell.style.backgroundColor = `rgba(0, 0, 0, 0.4)`;
+    } else {
+        const red = Math.round(255 * value);
+        const green = Math.round(255 * (1 - value));
+        cell.style.backgroundColor = `rgb(${red}, ${green}, 0)`;
+    }
+    const isSelected = this.selectedCell.find(c => c.dataset.x == cell.dataset.x && c.dataset.y == cell.dataset.y);
+    if (isSelected) {
+        removeSelectedCell(isSelected);
+        addSelectedCell(cell);
+    }   
+}
+
 
 function addSelectedCell(cell) {
     cell.classList.add('selected');
@@ -70,22 +79,30 @@ function removeSelectedCell(cell) {
 }
 
 async function updateValue(x, y, value) {
-    await request('update', 'POST', { x, y, value });
-    renderMatrix();
+    const response = await request('update', 'POST', { x, y, value });
+    if (response.success) {
+        renderEngine(x, y, value);
+    }
 }
 
 async function updateList(list, value) {
-    await request('update/list', 'POST', { list, value });
-    renderMatrix();
+    const response = await request('update/list', 'POST', { list, value });
+    if (response.success) {
+        list.forEach(element => {
+            renderEngine(element.x, element.y, value);
+        });
+    }
 }
 
 async function adjustAll(value) {
     await request('control', 'POST', { adjustment: value });
-    renderMatrix();
+    cells.forEach(cell => {
+        renderEngine(cell.dataset.x, cell.dataset.y, value);
+    });
 }
 
 function handleSliderChange(event) {
-    const value = parseFloat(event.target.value);
+    const value =  (event.target.value);
     document.getElementById('slider-value').innerText = value.toFixed(2);
     if (selectedCell.length > 0) {
         const list = selectedCell.map(cell => {
