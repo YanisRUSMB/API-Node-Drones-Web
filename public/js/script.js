@@ -17,7 +17,26 @@ async function getMatrix() {
 
 addEventListener("DOMContentLoaded", () => {
     createMatrix();
+    document.getElementById('slider').addEventListener('input', handleSliderChange);
+    document.getElementById('clear').addEventListener('click', clearMatrix);
+    document.getElementById('line').addEventListener('click', () => {
+        if (selectedCell.length < 2 || selectedCell.length > 2) {
+            alert('Sélectionnez exactement 2 cellules pour dessiner une ligne');
+            return;
+        }
+        const x1 = parseInt(selectedCell[0].dataset.x);
+        const y1 = parseInt(selectedCell[0].dataset.y);
+        const x2 = parseInt(selectedCell[selectedCell.length - 1].dataset.x);
+        const y2 = parseInt(selectedCell[selectedCell.length - 1].dataset.y);
+        drawLine(x1, y1, x2, y2, parseFloat(document.getElementById('slider').value));
+    }
+    );
 });
+
+
+function clearMatrix() {
+    request('clear', 'GET').then(() => createMatrix());
+}
 
 function createMatrix() {
     getMatrix().then(matrix => {
@@ -89,7 +108,7 @@ async function updateList(list, value) {
     const response = await request('update/list', 'POST', { list, value });
     if (response.success) {
         list.forEach(element => {
-            renderEngine(element.x, element.y, value);
+            renderEngine(element[0], element[1], value);
         });
     }
 }
@@ -101,14 +120,21 @@ async function adjustAll(value) {
     });
 }
 
+async function drawLine(x1, y1, x2, y2, value) {
+    const response = await request('pixels/line', 'POST', { x1, y1, x2, y2, value });
+    response.pixels.forEach(pixel => {
+        renderEngine(pixel[0], pixel[1], value);
+    });
+}
+
+
 function handleSliderChange(event) {
     const value = parseFloat(event.target.value);
     document.getElementById('slider-value').innerText = value.toFixed(2);
     if (selectedCell.length > 0) {
         const list = selectedCell.map(cell => {
-            return { x: parseInt(cell.dataset.x), y: parseInt(cell.dataset.y) };
+            return [ parseInt(cell.dataset.x), parseInt(cell.dataset.y) ];
         });
-        
         updateList(list, value);
     }else {
         adjustAll(value);
