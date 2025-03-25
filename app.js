@@ -93,6 +93,65 @@ app.post('/api/pixels/line', (req, res) => {
     res.json({ pixels });
 });
 
+
+app.post('/api/pixels/rectangle', (req, res) => {
+    const { x1, y1, x2, y2, value } = req.body;
+    if (value < 0 || value > 1) {
+        return res.status(400).json({ error: 'Valeur invalide' });
+    }
+
+    if (x1 < 0 || x1 >= rows || y1 < 0 || y1 >= cols || x2 < 0 || x2 >= rows || y2 < 0 || y2 >= cols) {
+        return res.status(400).json({ error: 'Coordonnées invalides ou hors limites' });
+    }
+
+    const pixels = getPixelsFromRectangle(x1, y1, x2, y2);
+
+    pixels.forEach(([x, y]) => {
+        matrix[x][y] = value;
+    });
+
+    res.json({ pixels });
+});
+
+function getPixelsFromRectangle(x1, y1, x2, y2) {
+    const pixels = [];
+    for (let x = x1; x <= x2; x++) {
+        for (let y = y1; y <= y2; y++) {
+            pixels.push([x, y]);
+        }
+    }
+    return pixels;
+}
+
+app.post('/api/pixels/triangle', (req, res) => {
+    const { x1, y1, x2, y2, x3, y3, value } = req.body;
+
+    if (value < 0 || value > 1) {
+        return res.status(400).json({ error: 'Valeur invalide' });
+    }
+
+    if (
+        x1 < 0 || x1 >= rows || y1 < 0 || y1 >= cols ||
+        x2 < 0 || x2 >= rows || y2 < 0 || y2 >= cols ||
+        x3 < 0 || x3 >= rows || y3 < 0 || y3 >= cols
+    ) {
+        return res.status(400).json({ error: 'Coordonnées invalides ou hors limites' });
+    }
+
+    const edge1 = getPixelsFromLine(x1, y1, x2, y2);
+    const edge2 = getPixelsFromLine(x2, y2, x3, y3);
+    const edge3 = getPixelsFromLine(x3, y3, x1, y1);
+
+    const pixels = [...edge1, ...edge2, ...edge3];
+
+    pixels.forEach(([x, y]) => {
+        matrix[x][y] = value;
+    });
+
+    res.json({ pixels });
+});
+
+
 function getPixelsFromLine(x1, y1, x2, y2) {
     // Tableau pour stocker tous les pixels de la ligne
     const pixels = [];

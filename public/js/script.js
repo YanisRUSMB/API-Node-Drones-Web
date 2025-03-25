@@ -31,6 +31,33 @@ addEventListener("DOMContentLoaded", () => {
         drawLine(x1, y1, x2, y2, parseFloat(document.getElementById('slider').value));
     }
     );
+    document.getElementById('rectangle').addEventListener('click', () => {
+        if (selectedCell.length < 2 || selectedCell.length > 2) {
+            alert('Sélectionnez exactement 2 cellules pour dessiner un rectangle');
+            return;
+        }
+        const x1 = parseInt(selectedCell[0].dataset.x);
+        const y1 = parseInt(selectedCell[0].dataset.y);
+        const x2 = parseInt(selectedCell[selectedCell.length - 1].dataset.x);
+        const y2 = parseInt(selectedCell[selectedCell.length - 1].dataset.y);
+        const value = parseFloat(document.getElementById('slider').value);
+        drawRectangle(x1, y1, x2, y2, value);
+    });
+    document.getElementById('triangle').addEventListener('click', () => {
+        if (selectedCell.length < 3 || selectedCell.length > 3) {
+            alert('Sélectionnez exactement 3 cellules pour dessiner un triangle');
+            return;
+        }
+        const x1 = parseInt(selectedCell[0].dataset.x);
+        const y1 = parseInt(selectedCell[0].dataset.y);
+        const x2 = parseInt(selectedCell[1].dataset.x);
+        const y2 = parseInt(selectedCell[1].dataset.y);
+        const x3 = parseInt(selectedCell[2].dataset.x);
+        const y3 = parseInt(selectedCell[2].dataset.y);
+        const value = parseFloat(document.getElementById('slider').value);
+        drawTriangle(x1, y1, x2, y2, x3, y3, value);
+    }
+    );
 });
 
 
@@ -127,6 +154,19 @@ async function drawLine(x1, y1, x2, y2, value) {
     });
 }
 
+async function drawRectangle(x1, y1, x2, y2, value) {
+    const response = await request('pixels/rectangle', 'POST', { x1, y1, x2, y2, value });
+    response.pixels.forEach(pixel => {
+        renderEngine(pixel[0], pixel[1], value);
+    });
+}
+
+async function drawTriangle(x1, y1, x2, y2, x3, y3, value) {
+    const response = await request('pixels/triangle', 'POST', { x1, y1, x2, y2, x3, y3, value });
+    response.pixels.forEach(pixel => {
+        renderEngine(pixel[0], pixel[1], value);
+    });
+}
 
 function handleSliderChange(event) {
     const value = parseFloat(event.target.value);
