@@ -54,12 +54,17 @@ function renderEngine(x, y, value){
 
 function updateCell(cell, value) {
     if (value === 0) {
-        cell.style.backgroundColor = `rgba(0, 0, 0, 0.4)`;
+        cell.style.backgroundColor = `rgb(25, 25, 25)`;
     } else {
-        const red = Math.round(255 * value);
-        const green = Math.round(255 * (1 - value));
-        cell.style.backgroundColor = `rgb(${red}, ${green}, 0)`;
+        const minColor = 75;
+        const maxColor = 176;
+
+        const interpolatedColor = (minColor - maxColor) * (1 - value) + maxColor;
+
+        const color = Math.round(interpolatedColor);
+        cell.style.backgroundColor = `rgb(${color}, ${color}, ${color})`;
     }
+
     const isSelected = this.selectedCell.find(c => c.dataset.x == cell.dataset.x && c.dataset.y == cell.dataset.y);
     if (isSelected) {
         removeSelectedCell(isSelected);
