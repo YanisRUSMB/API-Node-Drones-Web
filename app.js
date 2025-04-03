@@ -74,7 +74,7 @@ app.post('/api/update/list', (req, res) => {
         matrix[x][y] = value;
     });
 
-    res.json({ success: true });
+    res.json({ success: true, matrix });
 });
 
 // Route pour ajuster globalement la puissance
@@ -86,7 +86,7 @@ app.post('/api/control', (req, res) => {
     }
 
     matrix = matrix.map(row => row.map(() => adjustment));
-    res.json({ success: true });
+    res.json({ success: true, matrix });
 });
 
 // Fonction pour calculer les pixels de la ligne (Bresenham)
