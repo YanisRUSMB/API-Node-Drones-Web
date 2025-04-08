@@ -92,10 +92,10 @@ app.post('/api/control', (req, res) => {
 // Fonction pour calculer les pixels de la ligne (Bresenham)
 function getPixelsFromLine(x1, y1, x2, y2) {
     const pixels = [];
-    let dx = Math.abs(x2 - x1);
-    let dy = Math.abs(y2 - y1);
-    let sx = x1 < x2 ? 1 : -1;
-    let sy = y1 < y2 ? 1 : -1;
+    let dx = Math.abs(x2 - x1); // distance horizontale
+    let dy = Math.abs(y2 - y1); // distance verticale
+    let sx = x1 < x2 ? 1 : -1; // 1 vers la droite, -1 vers la gauche
+    let sy = y1 < y2 ? 1 : -1; // 1 vers le haut, -1 vers le bas
     let err = dx - dy;
 
     while (true) {
@@ -185,3 +185,42 @@ app.post('/api/pixels/triangle', (req, res) => {
 
     res.json({ pixels });
 });
+
+
+app.post('/api/pixels/circle', (req, res) => {
+    let { cx, cy, radius, value } = req.body;
+
+    if (!isValidValue(value)) {
+        return res.status(400).json({ error: 'Valeur invalide' });
+    }
+
+
+    if (radius < 1) {
+        return res.status(400).json({ error: 'Rayon trop petit' });
+    }
+
+    radius = radius + 1; // Pour inclure le pixel de la bordure
+    
+    
+    if (!isValidCoord(cx, cy)) {
+        return res.status(400).json({ error: 'Coordonnées invalides' });
+    }
+
+
+    const pixels = [
+        ...getPixelsFromLine(cx, cy-radius, cx+radius, cy),
+        ...getPixelsFromLine(cx+radius, cy, cx, cy+radius),
+        ...getPixelsFromLine(cx, cy+radius, cx-radius, cy),        
+        ...getPixelsFromLine(cx, cy-radius, cx-radius, cy),
+    ];
+
+    pixels.forEach(([x, y]) => {
+        if (isValidCoord(x, y)) {
+            matrix[x][y] = value;
+        }
+    }
+
+    );
+
+    res.json({ pixels });
+} );

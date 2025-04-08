@@ -58,7 +58,27 @@ addEventListener("DOMContentLoaded", () => {
         drawTriangle(x1, y1, x2, y2, x3, y3, value);
     }
     );
+
+    document.getElementById('circle').addEventListener('click', () => {
+        if (selectedCell.length < 1 || selectedCell.length > 2) {
+            alert('Sélectionnez exactement 1 cellules pour dessiner un cercle');
+            return;
+        }
+        cx = parseInt(selectedCell[0].dataset.x);
+        cy = parseInt(selectedCell[0].dataset.y);
+        const radius = 2;
+        const value = parseFloat(document.getElementById('slider').value);
+        drawCircle(cx, cy, radius, value);
+    }
+    );
 });
+
+drawCircle = async (cx, cy, radius, value) => {
+    const response = await request('pixels/circle', 'POST', { cx, cy, radius, value });
+    response.pixels.forEach(pixel => {
+        renderEngine(pixel[0], pixel[1], value);
+    });
+}
 
 
 function clearMatrix() {
