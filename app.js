@@ -53,7 +53,7 @@ app.post('/api/update', (req, res) => {
     }
 
     matrix[x][y] = value;
-    res.json({ success: true, matrix });
+    res.json({ success: true });
 });
 
 app.post('/api/update/list', (req, res) => {
@@ -74,7 +74,7 @@ app.post('/api/update/list', (req, res) => {
         matrix[x][y] = value;
     });
 
-    res.json({ success: true, matrix });
+    res.json({ success: true });
 });
 
 // Route pour ajuster globalement la puissance
@@ -194,33 +194,48 @@ app.post('/api/pixels/circle', (req, res) => {
         return res.status(400).json({ error: 'Valeur invalide' });
     }
 
-
     if (radius < 1) {
         return res.status(400).json({ error: 'Rayon trop petit' });
     }
 
-    radius = radius + 1; // Pour inclure le pixel de la bordure
-    
-    
     if (!isValidCoord(cx, cy)) {
         return res.status(400).json({ error: 'Coordonnées invalides' });
     }
 
+    const pixels = [];
 
-    const pixels = [
-        ...getPixelsFromLine(cx, cy-radius, cx+radius, cy),
-        ...getPixelsFromLine(cx+radius, cy, cx, cy+radius),
-        ...getPixelsFromLine(cx, cy+radius, cx-radius, cy),        
-        ...getPixelsFromLine(cx, cy-radius, cx-radius, cy),
-    ];
+    let x = radius;
+    let y = 0;
+    let decisionOver2 = 1 - x;
 
-    pixels.forEach(([x, y]) => {
-        if (isValidCoord(x, y)) {
-            matrix[x][y] = value;
+    while (y <= x) {
+        const points = [
+            [cx + x, cy + y],
+            [cx + y, cy + x],
+            [cx - x, cy + y],
+            [cx - y, cy + x],
+            [cx - x, cy - y],
+            [cx - y, cy - x],
+            [cx + x, cy - y],
+            [cx + y, cy - x]
+        ];
+
+        points.forEach(([px, py]) => {
+            if (isValidCoord(px, py)) {
+                matrix[px][py] = value;
+                pixels.push([px, py]);
+            }
+        });
+
+        y++;
+
+        if (decisionOver2 <= 0) {
+            decisionOver2 += 2 * y + 1;
+        } else {
+            x--;
+            decisionOver2 += 2 * (y - x) + 1;
         }
     }
 
-    );
-
     res.json({ pixels });
-} );
+});
