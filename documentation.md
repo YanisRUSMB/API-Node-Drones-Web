@@ -29,7 +29,6 @@
 ```json
 {
   "success": true,
-  "matrix": [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ...]
 }
 ```
 
@@ -44,7 +43,6 @@
 ```json
 {
   "success": true,
-  "matrix": [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ...]
 }
 ```
 
@@ -58,7 +56,6 @@
 ```json
 {
   "success": true,
-  "matrix": [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ...]
 }
 ```
 
@@ -117,7 +114,19 @@
   "pixels": [[x1, y1], [x2, y2], [x3, y3], ...]
 }
 ```
+### 10. `/api/pixels/circle` - Dessiner un cercle
+- **Méthode** : `POST`
+- **Paramètres du corps de la requête** :
+  - `cx, cy`: Coordonnées du centre.
+  - `radius`: Rayon du cercle.
+  - `value`: Valeur à appliquer aux pixels du cercle.
 
+**Exemple de réponse** :
+```json
+{
+  "pixels": [[x1, y1], [x2, y2], [x3, y3], ...]
+}
+```
 ## Erreurs
 Les erreurs suivantes peuvent être renvoyées par l'API :
 - **400 Bad Request** : Paramètres invalides ou manquants.
