@@ -1,7 +1,22 @@
 const express = require('express');
+const { SerialPort } = require('serialport');
+const { ReadlineParser } = require('@serialport/parser-readline');
 const path = require('path');
+const { send } = require('process');
 const app = express();
 const port = 3000;
+
+// Partie arduino
+// Ouvre le port série (mets le bon port COM ici)
+const arduinoPort = new SerialPort({
+    path: 'COM4',
+    baudRate: 9600
+  });
+
+const parser = arduinoPort.pipe(new ReadlineParser({ delimiter: '\n' }));
+
+
+
 
 app.use(express.json());
 
@@ -16,6 +31,21 @@ app.listen(port, () => {
 app.get('/', (req, res) => {
     res.render('index');
 });
+
+
+function setSpeed(x, y, value) {
+    const id = x * cols + y;
+
+    const power = Math.round(1000 + value * 1000);
+    const powerClamped = Math.max(1000, Math.min(2000, power));
+  
+    const command = `SET ${id} ${powerClamped}\n`;
+  
+    console.log('Envoi à Arduino :', command.trim());
+    arduinoPort.write(command);
+  
+    console.log(`Commande envoyée: ${command}`);
+}
 
 // Configuration de la matrice
 const rows = 10;
@@ -72,6 +102,7 @@ app.post('/api/update/list', (req, res) => {
             return res.status(400).json({ error: `Coordonnées invalides: (${x}, ${y})` });
         }
         matrix[x][y] = value;
+        setSpeed(x, y, value);
     });
 
     res.json({ success: true });
