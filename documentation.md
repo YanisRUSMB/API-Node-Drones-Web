@@ -29,6 +29,7 @@
 ```json
 {
   "success": true,
+  "matrix": [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ...]
 }
 ```
 
@@ -127,6 +128,26 @@
   "pixels": [[x1, y1], [x2, y2], [x3, y3], ...]
 }
 ```
+
+### 11. `/api/animate/line` - Fait une animation de ligne (augmentation de la valeur sur toute la ligne)
+- **Méthode** : `POST`
+- **Paramètres du corps de la requête** :
+  - `x1, y1`: Coordonnées de départ.
+  - `x2, y2`: Coordonnées de fin.
+  - `startValue`: Valeur de départ.
+  - `endValue`: Valeur de fin.
+  - `duration`: Durée de l'animation en millisecondes.
+
+**Exemple de réponse** :
+```json
+  
+  {
+    "success": true,
+    "pixels": [[x1, y1], [x2, y2], ...],
+    "message": "Animation démarrée"
+  }
+```
+
 ## Erreurs
 Les erreurs suivantes peuvent être renvoyées par l'API :
 - **400 Bad Request** : Paramètres invalides ou manquants.
