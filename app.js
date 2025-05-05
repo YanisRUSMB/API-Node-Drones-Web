@@ -270,3 +270,53 @@ app.post('/api/pixels/circle', (req, res) => {
 
     res.json({ pixels });
 });
+
+
+function animatePixelsSequential(pixels, startValue, endValue, duration) {
+    const steps = 60;
+    const pixelDelay = 150; // ms entre chaque pixel
+    const stepInterval = duration / steps;
+
+    pixels.forEach((pixel, index) => {
+        setTimeout(() => {
+            let currentStep = 0;
+            const stepValue = (endValue - startValue) / steps;
+
+            const intervalId = setInterval(() => {
+                if (currentStep > steps) {
+                    clearInterval(intervalId);
+                    return;
+                }
+
+                const currentValue = Math.round(startValue + stepValue * currentStep);
+                const [x, y] = pixel;
+                console.log(`Animation pixel: (${x}, ${y}) - Valeur: ${currentValue}`);
+                if (isValidCoord(x, y)) {
+                    matrix[x][y] = currentValue;
+                }
+
+                currentStep++;
+            }, stepInterval);
+        }, index * pixelDelay);
+    });
+}
+
+
+app.post('/api/animate/line', (req, res) => {
+    const { x1, y1, x2, y2, startValue, endValue, duration } = req.body;
+
+    if (
+        !isValidCoord(x1, y1) ||
+        !isValidCoord(x2, y2) ||
+        typeof startValue !== 'number' ||
+        typeof endValue !== 'number' ||
+        typeof duration !== 'number'
+    ) {
+        return res.status(400).json({ error: 'Paramètres invalides' });
+    }
+
+    const pixels = getPixelsFromLine(x1, y1, x2, y2);
+    animatePixelsSequential(pixels, startValue, endValue, duration);
+
+    res.json({ success: true, pixels, message: "Animation démarrée" });
+});
