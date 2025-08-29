@@ -1,7 +1,22 @@
 const express = require('express');
+const { SerialPort } = require('serialport');
+const { ReadlineParser } = require('@serialport/parser-readline');
 const path = require('path');
+const { send } = require('process');
 const app = express();
 const port = 3000;
+
+// Partie arduino
+// Ouvre le port série (mets le bon port COM ici)
+const arduinoPort = new SerialPort({
+    path: 'COM4',
+    baudRate: 9600
+  });
+
+const parser = arduinoPort.pipe(new ReadlineParser({ delimiter: '\n' }));
+
+
+
 
 app.use(express.json());
 
@@ -25,6 +40,21 @@ app.get('/map', (req, res) => {
 app.get('/hover', (req, res) => {
     res.render('hover');
 });
+
+
+function setSpeed(x, y, value) {
+    const id = x * cols + y;
+
+    const power = Math.round(1000 + value * 1000);
+    const powerClamped = Math.max(1000, Math.min(2000, power));
+  
+    const command = `SET ${id} ${powerClamped}\n`;
+  
+    console.log('Envoi à Arduino :', command.trim());
+    arduinoPort.write(command);
+  
+    console.log(`Commande envoyée: ${command}`);
+}
 
 // Configuration de la matrice
 const rows = 10;
@@ -81,6 +111,7 @@ app.post('/api/update/list', (req, res) => {
             return res.status(400).json({ error: `Coordonnées invalides: (${x}, ${y})` });
         }
         matrix[x][y] = value;
+        setSpeed(x, y, value);
     });
 
     res.json({ success: true });
@@ -247,4 +278,54 @@ app.post('/api/pixels/circle', (req, res) => {
     }
 
     res.json({ pixels });
+});
+
+
+function animatePixelsSequential(pixels, startValue, endValue, duration) {
+    const steps = 60;
+    const pixelDelay = 150; // ms entre chaque pixel
+    const stepInterval = duration / steps;
+
+    pixels.forEach((pixel, index) => {
+        setTimeout(() => {
+            let currentStep = 0;
+            const stepValue = (endValue - startValue) / steps;
+
+            const intervalId = setInterval(() => {
+                if (currentStep > steps) {
+                    clearInterval(intervalId);
+                    return;
+                }
+
+                const currentValue = Math.round(startValue + stepValue * currentStep);
+                const [x, y] = pixel;
+                console.log(`Animation pixel: (${x}, ${y}) - Valeur: ${currentValue}`);
+                if (isValidCoord(x, y)) {
+                    matrix[x][y] = currentValue;
+                }
+
+                currentStep++;
+            }, stepInterval);
+        }, index * pixelDelay);
+    });
+}
+
+
+app.post('/api/animate/line', (req, res) => {
+    const { x1, y1, x2, y2, startValue, endValue, duration } = req.body;
+
+    if (
+        !isValidCoord(x1, y1) ||
+        !isValidCoord(x2, y2) ||
+        typeof startValue !== 'number' ||
+        typeof endValue !== 'number' ||
+        typeof duration !== 'number'
+    ) {
+        return res.status(400).json({ error: 'Paramètres invalides' });
+    }
+
+    const pixels = getPixelsFromLine(x1, y1, x2, y2);
+    animatePixelsSequential(pixels, startValue, endValue, duration);
+
+    res.json({ success: true, pixels, message: "Animation démarrée" });
 });
