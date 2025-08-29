@@ -16,6 +16,15 @@ app.listen(port, () => {
 app.get('/', (req, res) => {
     res.render('index');
 });
+app.get('/scenes', (req, res) => {
+    res.render('scenes');
+});
+app.get('/map', (req, res) => {
+    res.render('map');
+});
+app.get('/hover', (req, res) => {
+    res.render('hover');
+});
 
 // Configuration de la matrice
 const rows = 10;

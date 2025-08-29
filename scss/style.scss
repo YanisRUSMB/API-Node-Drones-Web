@@ -165,6 +165,7 @@ body{
                 opacity: 0.4;
                 transition: all 0.2s ease-in-out;
                 filter: drop-shadow(0px 0px 0px white);
+                cursor: pointer;
                 &.active, &:hover{
                     opacity: 1;
                     filter: drop-shadow(0px 0px 1px white);
@@ -267,6 +268,5 @@ body{
                 }
             }
         }
-        
     }
 }

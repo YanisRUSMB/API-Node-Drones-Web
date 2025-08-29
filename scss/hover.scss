@@ -1,0 +1,83 @@
+body{
+    .slider-hover-container{
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        margin: auto;
+        height: 20vh;
+        .slider, .slider-2 {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin: auto;
+            span{
+                margin: auto;
+                color: white;
+                font-family: fustat, sans-serif;
+                font-weight: 400;
+                font-style: normal;
+                font-size: 2.5vh;
+            }
+            .valeur{
+                display: flex;
+                flex-direction: row;
+                align-self: center;
+                justify-content: center;
+                color: white;
+                #slider-value {
+                    padding: 0.5vw;
+                    background-color: #ffffff40;
+                    border-radius: 0.5vw;
+                    border: white solid 0.2vw;
+                    color: white;
+                    margin: 0;
+                    width: 4vw;
+                    text-align: center;
+                    font-size: 1vw;
+                    &::-webkit-outer-spin-button,
+                    &::-webkit-inner-spin-button {
+                        -webkit-appearance: none;
+                        margin: 0;
+                    }
+                    &:focus-visible{
+                        outline: none;
+                    }
+                }
+                span{
+                    width: fit-content;
+                    height: fit-content;
+                    margin: auto;
+                    margin-left: 1vw;
+                    font-family: fustat, sans-serif;
+                    font-weight: 400;
+                    font-style: normal;
+                    font-size: 1vw;
+                }
+            }
+            input[type="range"] {
+                -webkit-appearance: none;
+                width: 10vw;
+                height: 0.2vw;
+                opacity: 0.7;
+                &:focus-visible{
+                    outline: none;
+                }
+                &::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    background-color: #666666;
+                    border: white solid 0.15vw;
+                    width: 2vw;
+                    height: 1vw;
+                    border-radius: 0.3vw;
+                    &:hover{
+                        background-color: #5f5f5f;
+                    }
+                    &:active{
+                        background-color: #535353;
+                    }
+                }
+            }
+        }
+    }
+}

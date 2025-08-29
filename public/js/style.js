@@ -3,7 +3,38 @@ let compteur = document.querySelector(".compteur");
 let loading_bar = document.querySelector(".loading_bar");
 let valeurCompteur = 0;
 
+/* ---------------  MENU  ------------------ */
+let scenarioBtn = document.querySelector("#scene");
+let mapBtn = document.querySelector("#map");
+let windBtn = document.querySelector("#wind");
+let hoverBtn = document.querySelector("#diffusion");
+windBtn.addEventListener("click", function () {
+    window.location.href = "/";
+});
+mapBtn.addEventListener("click", function () {
+    window.location.href = "/map";
+});
+scenarioBtn.addEventListener("click", function () {
+    window.location.href = "/scenes";
+});
+hoverBtn.addEventListener("click", function () {
+    window.location.href = "/hover";
+});
+if (window.location.pathname === "/") {
+    windBtn.classList.add("active");
+}
+if (window.location.pathname === "/map") {
+    mapBtn.classList.add("active");
+}
+if (window.location.pathname === "/scenes") {
+    scenarioBtn.classList.add("active");
+}
+if (window.location.pathname === "/hover") {
+    hoverBtn.classList.add("active");
+}
+
 document.addEventListener("DOMContentLoaded", function () {
+    gsap.registerPlugin(MorphSVGPlugin)
     function fadeOutLoader() {
         gsap.to(loader, {
             opacity: 0,
